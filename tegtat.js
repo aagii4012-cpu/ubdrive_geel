@@ -3,7 +3,22 @@
    Map is fictionalized and compact: Peace Avenue, the Baga Toiruu ring,
    a Sükhbaatar-Square-inspired plaza, apartment blocks, mountains around. */
 
-import * as THREE from "./vendor/three.module.min.js";
+// Load Three.js from this site; if the vendor file is missing, fall back to the CDN copy.
+let THREE;
+try {
+  THREE = await import("./vendor/three.module.min.js");
+} catch (localErr) {
+  console.warn("[TEGTAT] vendor/three.module.min.js not found, using CDN", localErr);
+  try {
+    THREE = await import("https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js");
+  } catch (cdnErr) {
+    const l = document.getElementById("loading");
+    window.__tegtatFail = true;
+    if (l) l.textContent = "3D сан ачаалагдсангүй. vendor/three.module.min.js файл сайтад байгаа эсэхийг шалгана уу.";
+    throw cdnErr;
+  }
+}
+window.__tegtatModule = true;
 
 (() => {
   "use strict";
@@ -1790,6 +1805,7 @@ import * as THREE from "./vendor/three.module.min.js";
     window.addEventListener("resize", resize);
     ui.loading.textContent = "";
     ui.startBtn.disabled = false;
+    window.__tegtatReady = true;
     requestAnimationFrame((t) => { last = t; requestAnimationFrame(frame); });
     if (TEST) window.__tegtat = { game, player, traffic, CPS, coins, NODE, COLL, finishRun, teleport(x, z, h) { player.x = x; player.z = z; player.heading = h || 0; player.speed = 0; }, info: () => renderer.info.render, input, snap() { updateCamera(0, true); }, simulate(sec) { const n = Math.round(sec / STEP); for (let i = 0; i < n; i++) { acc = STEP; tickLogicOnly(); } } };
   }

@@ -60,7 +60,7 @@
           <label for="player-name" class="ov-label">ENTER YOUR NAME</label>
           <input id="player-name" type="text" maxlength="16" autocomplete="nickname" spellcheck="false" placeholder="Nickname" required>
           <p class="form-error" id="name-error" role="alert" hidden></p>
-          <button type="submit" class="btn btn-primary" id="start-btn">START DRIVING</button>
+          <button type="submit" class="btn btn-primary" id="start-btn" disabled>START DRIVING</button>
         </form>
         <div class="ov-row">
           <button type="button" class="btn btn-ghost btn-sm" data-action="board">TOP DRIVERS</button>
@@ -125,5 +125,19 @@
   </nav>
 
   <script type="module" src="tegtat.js"></script>
+  <script>
+    // Safety net: never let the form reload the page, and explain if the game script fails to start.
+    document.getElementById("name-form").addEventListener("submit", function (e) { if (!window.__tegtatReady) e.preventDefault(); });
+    window.addEventListener("error", function (e) {
+      if (window.__tegtatReady || window.__tegtatFail) return;
+      var l = document.getElementById("loading");
+      if (l) l.textContent = "Тоглоом ачаалахад алдаа гарлаа: " + (e.message || "script") + ". Хуудсаа шинэчилнэ үү.";
+    });
+    setTimeout(function () {
+      if (window.__tegtatReady || window.__tegtatFail) return;
+      var l = document.getElementById("loading");
+      if (l) l.textContent = window.__tegtatModule ? "Газрын зураг удаан ачаалж байна…" : "Тоглоомын скрипт (tegtat.js) ачаалагдсангүй. Файлууд сайтад бүрэн орсон эсэхийг шалгана уу.";
+    }, 12000);
+  </script>
 </body>
 </html>
